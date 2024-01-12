@@ -1,0 +1,8 @@
+requests
+tiktoken
+openai
+beautifulsoup4
+backoff
+sacrebleu
+gensim
+nltk
