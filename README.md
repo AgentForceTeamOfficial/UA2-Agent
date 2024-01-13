@@ -11,9 +11,9 @@
 
 🎡 **Methods used for comparison**:
 
-- [**CoT-SC**](https://arxiv.org/abs/2203.11171): Sampling diverse Chain-of-Thought reasoning paths and action candidates, and voting for the majority to enhance self consistency.
+- [**CoT-SC**](https://arxiv.org/abs/2203.11171): Sampling diverse [Chain-of-Thought reasoning](https://arxiv.org/abs/2201.11903) paths and action candidates, and voting for the majority to enhance self consistency.
 - [**ReAct**](https://arxiv.org/abs/2210.03629): On each step, the agent decides whether to take actions or reason about the query based on the current state.
-- **ReACT-SC**: Instead of [Chain-of-Thought reasoning](https://arxiv.org/abs/2201.11903), we apply sel consistency strategy to ReAct to further improve the performance.
+- **ReACT-SC**: Instead of Chain-of-Thought reasoning, we apply sel consistency strategy to ReAct to further improve the performance.
 - [**LATS**](https://arxiv.org/abs/2310.04406): an advanced method that unifies ReAct, self-reflection, and tree search based planning. We adapt the original implementation in our scenario for comparison.
 - **Ours**: the C-Agent framework, which is introduced in the below section.
 
@@ -39,7 +39,7 @@ The key challenge is to build an agent framework that manages to assist the deci
 💡 Here are some principles we follow:
 
 - **Reduce alignment cost**: quickly adapting to the user's preference by retrieving trajectories with high rewards beforehand.
-- **Reduce exploration cost**: directly extrapolating the key actions that lead to the success of the retrieved trajectories.
+- **Reduce exploration cost**: directly transfer short-cuts in interaction / reasoning process that lead to the success of the retrieved trajectories.
 - **Reduce self cost**: extracting structured records from free-form insights, without the aid of LLMs or human annotators; retrieving the most similar profile for reference, instead of agent planning from scratch or searching in huge memory/experience space.
 
 **Two major modules**:
@@ -127,18 +127,18 @@ After running the script, the results can be found in the directory `./runtime_l
 </div>
 
 - [An Liu](https://github.com/xxmlala) developed the insight-module, conducted thorough experiments, implemented baselines and data visualization.
-- [Zijun Liu](https://github.com/BBQGOD) initiated the conceptualization of Profiler, define and refine the C-Agent Framework leveraging structured profiles, and conducted thorough experiments.
+- [Zijun Liu](https://www.linkedin.cn/incareer/in/%E5%AD%90%E5%90%9B-%E5%88%98-164596263) initiated the conceptualization of Profiler, define and refine the C-Agent Framework leveraging structured profiles, and conducted thorough experiments.
 - [Kaiming Liu](https://github.com/KMing-L) developed the runtime environment and the retrieval component of the Profiler, as well as calibrating the presentation of performances of different methods.
 - [Zeyuan Yang](https://github.com/MiicheYang) and [Zonghan Yang](https://minicheshire.github.io) contributed to the initial version of the runtime environment wrapper.
 - [Zonghan Yang](https://minicheshire.github.io) implemented the initial build of ReAct, and was also in charge of the final version of data visualization.
-- [Zhicheng Guo](https://github.com/zhichengg), [Qingyuan Hu](https://github.com/HQY188), [Kaiming Liu](https://github.com/KMing-L), [An Liu](https://github.com/xxmlala), [Zijun Liu](https://github.com/BBQGOD), and [Zonghan Yang](https://minicheshire.github.io) collaborated on the implementation of the baseline methods and their evaluation. The respective leaders are:
+- [Zhicheng Guo](https://github.com/zhichengg), [Qingyuan Hu](https://github.com/HQY188), [Kaiming Liu](https://github.com/KMing-L), [An Liu](https://github.com/xxmlala), [Zijun Liu](https://www.linkedin.cn/incareer/in/%E5%AD%90%E5%90%9B-%E5%88%98-164596263), and [Zonghan Yang](https://minicheshire.github.io) collaborated on the implementation of the baseline methods and their evaluation. The respective leaders are:
   - LATS: [Zhicheng Guo](https://github.com/zhichengg) and [An Liu](https://github.com/xxmlala)
   - RAP: [An Liu](https://github.com/xxmlala)
   - ReAct: [Kaiming Liu](https://github.com/KMing-L) and [Zonghan Yang](https://minicheshire.github.io)
   - CoT-L2M: [Qingyuan Hu](https://github.com/HQY188) and [Kaiming Liu](https://github.com/KMing-L)
   - ReAct-SC & CoT-SC: [Kaiming Liu](https://github.com/KMing-L)
   - Overall co-lead: [An Liu](https://github.com/xxmlala) and [Zijun Liu](https://github.com/BBQGOD)
-- [An Liu](https://github.com/xxmlala), [Zijun Liu](https://github.com/BBQGOD), and [Kaiming Liu](https://github.com/KMing-L) also provided significant advice to the construction and configuration of the C-WebShop environment.
+- [An Liu](https://github.com/xxmlala), [Zijun Liu](https://www.linkedin.cn/incareer/in/%E5%AD%90%E5%90%9B-%E5%88%98-164596263), and [Kaiming Liu](https://github.com/KMing-L) also provided significant advice to the construction and configuration of the C-WebShop environment.
 
 
 This project is advised by [Peng Li](https://www.lpeng.net/) (lipeng@air.tsinghua.edu.cn) and [Yang Liu](https://nlp.csai.tsinghua.edu.cn/~ly/) (liuyang2011@tsinghua.edu.cn).
