@@ -81,11 +81,6 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
                     print(e)
                     print(inter_obs)
                 return 0, all_used_time, all_used_money
-            if len(instr_history) > 0:
-                inter_obs += "\nInstruction History:"
-                for idx, instr in enumerate(instr_history):
-                    if idx + 10 >= len(instr_history):
-                        inter_obs += f"\n{idx+1}. {instr}"
             if i == 0:
                 instr_history.append(now_instr)
                 init_message = inter_obs
@@ -110,9 +105,8 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
 
         actions = {}
         for _ in range(sample_nums):
-            hyper_args   = {"stop": ["\n"], "max_tokens": 100, "temperature": 0.05}
+            hyper_args   = {"stop": ["\n"], "max_tokens": 100, "temperature": 0.1}
             action       = f"ask[{model}][{query_prompt}][{json.dumps(hyper_args)}]" 
-            fail_cnt = 0
             while True:
                 url, all_obs, done, API_success, inter_rwd, all_used_time, all_used_money = env.step(user_idx, task_idx, action)
                 if to_print and not API_success:
@@ -120,10 +114,9 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
                 if API_success: 
                     break
                 else:
-                    # time.sleep(1)
-                    fail_cnt += 1
-                    if fail_cnt >= 5:
-                        return 0, all_used_time, all_used_money
+                    if to_print:
+                        print("Sleep 1s")
+                    time.sleep(1)
             
             st_pos = all_obs.find('LLM_response[')
             action = all_obs[st_pos+len('LLM_response['):]
@@ -216,12 +209,12 @@ Rating: N.A.
 
 Thought: I have selected 'bright citrus' and '3 ounce (pack of 1)'. I can buy it now. Next action: click[Buy Now]
 """
-    to_print     = False
+    to_print     = True
     L            = 0
     USER_NUM     = 10
     TASK_NUM     = 50  
     SAMPLE_NUMS  = sample_nums
-    file_name    = f"../runtime_logs/cot_sc{SAMPLE_NUMS}_cwebshopRunTimeEnvSession_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"               # log file for results
+    file_name    = f"../runtime_logs/cot_sc{SAMPLE_NUMS}_5000_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"               # log file for results
     avg_reward   = []
     success_rate = []
     avg_time     = []

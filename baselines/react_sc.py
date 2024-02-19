@@ -103,7 +103,7 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
         observations.append(inter_obs)
         prompt = observations[0]
         min_idx = len(observations)
-        while min_idx - 1 > 0 and num_tokens(prompt + f"\n\n{observations[min_idx-1]}" + init_prompt) < 4000:
+        while min_idx - 1 > 0 and num_tokens(prompt + f"\n\n{observations[min_idx-1]}" + init_prompt) < 3900:
             prompt += f"\n\n{observations[min_idx-1]}"
             min_idx -= 1
         prompt = observations[0]
@@ -132,10 +132,9 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
                 if API_success: 
                     break
                 else:
-                    # time.sleep(1)
-                    fail_cnt += 1
-                    if fail_cnt >= 5:
-                        return 0, all_used_time, all_used_money
+                    if to_print:
+                        print("Sleep 1 second")
+                    time.sleep(1)
             
             st_pos = all_obs.find('LLM_response[')
             action = all_obs[st_pos+len('LLM_response['):]
@@ -204,12 +203,12 @@ Observation: You have clicked 3 ounce (pack of 1).
 
 Action: click[Buy Now]
 """
-    to_print     = False
+    to_print     = True
     L            = 0
     USER_NUM     = 10
     TASK_NUM     = 50  
     SAMPLE_NUMS  = sample_nums
-    file_name    = f"../runtime_logs/react_sc{SAMPLE_NUMS}_webshopRunTimeEnvSession_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"              # log file for results
+    file_name    = f"../runtime_logs/react_sc{SAMPLE_NUMS}_5000_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"              # log file for results
     avg_reward   = []
     success_rate = []
     avg_time     = []

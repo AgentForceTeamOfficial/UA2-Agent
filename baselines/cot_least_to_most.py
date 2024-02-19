@@ -116,7 +116,7 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
         min_idx = len(actions)
         if len(observations) > 0:
             prompt += f"\n{observations[-1]}"
-        while min_idx > 0 and num_tokens(prompt + f"\n\nSubTask: {subtasks[min_idx-1]}\nAction: {actions[min_idx-1]}" + f"\n\nYou should think step by step and choose the next action. Action format: tool[content]. Only item between 'brackets' in observation can be clicked.\nIf you can't finish the task in one step, you should decompose it and response next task.\nTask: {task}\nThought:" + init_prompt) < 3900:
+        while min_idx > 0 and num_tokens(prompt + f"\n\nSubTask: {subtasks[min_idx-1]}\nAction: {actions[min_idx-1]}" + f"\n\nYou should think step by step and choose the next action. Action format: tool[content]. Only item between 'brackets' in observation can be clicked.\nIf you can't finish the task in one step, you should decompose it and response next task.\nTask: {task}\nThought:" + init_prompt) < 3800:
             prompt += f"\n\nSubTask: {subtasks[min_idx-1]}\nAction: {actions[min_idx-1]}"
             min_idx -= 1
         prompt = init_message
@@ -144,7 +144,6 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
 
             hyper_args   = {"stop": ["\n"], "max_tokens": 100, "temperature": 0.0}
             action       = f"ask[{model}][{query_prompt}][{json.dumps(hyper_args)}]" 
-            fail_cnt = 0
             while True:
                 url, all_obs, done, API_success, inter_rwd, all_used_time, all_used_money = env.step(user_idx, task_idx, action)
                 if to_print and not API_success:
@@ -152,10 +151,9 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
                 if API_success: 
                     break
                 else:
-                    # time.sleep(1)
-                    fail_cnt += 1
-                    if fail_cnt >= 5:
-                        return 0, all_used_time, all_used_money
+                    if to_print:
+                        print("Sleep 1s")
+                    time.sleep(1)
 
             st_pos = all_obs.find('LLM_response[')
             action = all_obs[st_pos+len('LLM_response['):]
@@ -279,11 +277,11 @@ Rating: N.A.
 Task: i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars.
 Thought: I have selected 'bright citrus' and '3 ounce (pack of 1)'. I can buy it now. Next action: click[Buy Now]
 """
-    to_print     = False
+    to_print     = True
     L            = 0
     USER_NUM     = 10
     TASK_NUM     = 50  
-    file_name    = f"../runtime_logs/cot_least_to_most_cwebshopRunTimeEnvSession_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"               # log file for results
+    file_name    = f"../runtime_logs/cot_least_to_most_5000_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"               # log file for results
     avg_reward   = []
     success_rate = []
     avg_time     = []
