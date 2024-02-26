@@ -9,7 +9,7 @@ import re
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 
-WEBSHOP_URL = "http://103.242.175.119:4000"
+WEBSHOP_URL = "<path to the env without HI>"
 ACTION_TO_TEMPLATE = {
     "Description": "description_page.html",
     "Features": "features_page.html",

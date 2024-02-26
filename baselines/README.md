@@ -1,10 +1,10 @@
 # QuickStart Guide & Examples
 
-This directory contains examples of AgentForce environments to help you get started with AgentForce effectively.
+This directory contains example baselines on the **UA**$^2$-Webshop environment to help you replicate our experiments effectively.
 
 ## Quick Start
 
-To begin, we provide a simple template `example.py`. This will guide you through interacting with the AgentForce environment and executing actions at each step.
+To begin, we provide a simple template `example.py`. This will guide you through interacting with the **UA**$^2$-Webshop environment and executing actions at each step.
 
 ### Step0: Set up your OPENAI_API_KEY
 
@@ -33,16 +33,16 @@ Returns:
 
 ### Step2: Get the next action
 
-Complete the `get_next_action()` function. This function is crucial for determining the subsequent move in the AgentForce environment. A legal action is composed of specific commands:
+Complete the `get_next_action()` function. This function is crucial for determining the subsequent move in the **UA**$^2$-Webshop environment. A legal action is composed of specific commands:
 - `think[xxx]`: Use this action to internally process or decide the next step without interacting with the web environment. Replace 'xxx' with your specific thinking or decision-making process.
-- `search[xxx]`: This action directs the agent to perform a web search. Replace 'xxx' with the query you wish to search for.
-- `click[xxx]`: Utilize this action to simulate a click in the web environment. Replace 'xxx' with the identifier of the item you want to click on.
+- `search[xxx]`: This action directs the agent to perform a search. Replace 'xxx' with the query you wish to search for.
+- `click[xxx]`: Utilize this action to simulate a click in the webshop environment. Replace 'xxx' with the identifier of the item you want to click on.
 
 Ensure that the actions you generate are valid and contextually appropriate for the task at hand. The effectiveness of your agent relies heavily on the relevance and strategic use of these actions.
 
 ## Baselines Example
 
-We provide four example baselines for AgentForce:
+We provide four example baselines on the **UA**$^2$-Webshop:
 - `react.py`
 - `react_sc.py`
 - `cot_sc.py`
@@ -61,8 +61,8 @@ Search for "# [*]" in the code to find these sections easily.
 Set up your environments with the following commands:
 
 ```shell
-conda create -n agentforce python=3.11
-conda activate agentforce
+conda create -n ua2 python=3.11
+conda activate ua2
 pip install -r ../requirements.txt
 ```
 

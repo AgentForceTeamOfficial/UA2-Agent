@@ -1,5 +1,4 @@
 import os
-import openai
 import numpy as np
 from typing import Optional, Union
 import time

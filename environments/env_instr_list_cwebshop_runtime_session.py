@@ -11,7 +11,7 @@ import re
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 
-WEBSHOP_URL = "http://103.242.175.119:5000"
+WEBSHOP_URL = "<path to the env>"
 ACTION_TO_TEMPLATE = {
     "Description": "description_page.html",
     "Features": "features_page.html",
