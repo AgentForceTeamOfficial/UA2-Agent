@@ -119,13 +119,13 @@ For LATS baselines:
 ```sh
 cd baselines/lats
 mkdir runtime_logs
-python lats.py
+./lats.sh
 ```
 
-For RAP baselines:
+For Reflexion:
 ```sh
-cd baselines/rap/rap_webshop
-python rap_inference_v1benchmark.py
+cd baselines/reflexion
+./reflexion.sh
 ```
 
 To test our method:
@@ -134,7 +134,7 @@ cd code
 python react_w_insights_w_profiler_v1benchmark.py
 ```
 
-After running the script, the results can be found in the directory `./runtime_logs`
+After running the script, the results can be found in the directory `./runtime_logs`. More details can be found in `./baselines/README.md`.
 
 ## Authors
 
@@ -149,7 +149,6 @@ After running the script, the results can be found in the directory `./runtime_l
 - [Zonghan Yang](https://minicheshire.github.io) was also in charge of the final version of data visualization.
 - [Zhicheng Guo](https://github.com/zhichengg), [Qingyuan Hu](https://github.com/HQY188), [Kaiming Liu](https://github.com/KMing-L), [An Liu](https://github.com/xxmlala), [Zijun Liu](https://www.linkedin.cn/incareer/in/%E5%AD%90%E5%90%9B-%E5%88%98-164596263), and [Zonghan Yang](https://minicheshire.github.io) collaborated on the implementation of the baseline methods and their evaluation. The respective leaders are:
   - LATS: [Zhicheng Guo](https://github.com/zhichengg) and [An Liu](https://github.com/xxmlala)
-  - RAP: [An Liu](https://github.com/xxmlala)
   - Reflexion: [An Liu](https://github.com/xxmlala) and [Zijun Liu](https://www.linkedin.cn/incareer/in/%E5%AD%90%E5%90%9B-%E5%88%98-164596263)
   - ReAct: [Kaiming Liu](https://github.com/KMing-L) and [Zonghan Yang](https://minicheshire.github.io)
   - CoT-L2M: [Qingyuan Hu](https://github.com/HQY188) and [Kaiming Liu](https://github.com/KMing-L)

@@ -1,10 +1,9 @@
 import logging
 import copy
 import sys
-# sys.path.append("../")
-sys.path.append('/home/gzc/data1/AgentForce-dev')
+sys.path.append('../../')
 from environments.apis import num_tokens_from_messages
-from environments.env_instr_list_cwebshop_runtime import cwebshopRunTimeEnv, WEBSHOP_URL
+from environments.env_instr_list_cwebshop_runtime_session import cwebshopRunTimeEnv, WEBSHOP_URL
 
 import argparse
 from datetime import datetime
@@ -34,19 +33,28 @@ def num_tokens(prompt, model='gpt-3.5-turbo-instruct-0914'):
     num, _, _ = num_tokens_from_messages(prompt, model)
     return num
 
-def find_single_right_bracket(str0):
+def find_single_right_bracket(str0): 
+    """
+    Find the position of the first single right bracket in str0.
+    """
     bracket_cnt = 1
+    final_pos = 0
     for i in range(len(str0)):
-        if str0[i] == "[": bracket_cnt += 1
-        if str0[i] == "]": bracket_cnt -= 1
+        if str0[i] == "[":
+            bracket_cnt += 1
+        if str0[i] == "]":
+            bracket_cnt -= 1
+            final_pos = i
         if bracket_cnt == 0:
             return i
+    return final_pos
+
 
 def env_gpt(query_prompt, user_index, task_idx, n=1, to_print=False, stop=None, **kwargs):
     global all_used_money
     global all_used_time
-
-    hyper_args   = {"stop": stop, "max_tokens": 400, "temperature": 1.0,}
+    query_prompt = query_prompt.replace("[Instruction History]", "")
+    hyper_args   = {"stop": stop, "max_tokens": 100, "temperature": 1.0,}
     hyper_args.update(kwargs)
     
     if 'model' in hyper_args:
@@ -75,10 +83,6 @@ def env_gpt(query_prompt, user_index, task_idx, n=1, to_print=False, stop=None, 
                 print(f'Action: {action}\nObservation: {all_obs}\n')
             if API_success: 
                 break
-            # else:
-            #     import pdb; pdb.set_trace()
-                # time.sleep(1)#TODO
-                # all_used_time += 1
 
         st_pos = all_obs.find('LLM_response[')
         action = all_obs[st_pos+len('LLM_response['):]
@@ -86,12 +90,10 @@ def env_gpt(query_prompt, user_index, task_idx, n=1, to_print=False, stop=None, 
         action = action[:en_pos]
         action = action.strip()
         if action.startswith('['):
-            try:
-                # action = json.loads(action)
-                action = ast.literal_eval(action)
-                outputs.extend(action)
-            except:
-                continue
+            actions = action.split('",')
+            actions = [i.strip(' \n["') for i in actions]
+            actions = [ i if i.endswith(']') else i+']' for i in actions]
+            outputs.extend(actions)
         else:
             outputs.append(action)
     if len(outputs) == 0:
@@ -157,14 +159,15 @@ class WebShopTask():
 
         return reflection_mapping
     
-    # @staticmethod
-    # def standard_prompt_wrap(x: str, y:str='') -> str:
-    #     return standard_prompt.format(input=x) + y
-
+    @staticmethod
+    def standard_prompt_wrap(x: str, y:str='') -> str:
+        input = x + '\n' + y
+        return prompt1.format(input=input)
+ 
     @staticmethod
     def cot_prompt_wrap(x: str, y: str = '', reflection_mapping_list=[]):
         question = x
-        input = x + y
+        input = x + '\n' + y
         trajectories = ""
         
         if reflection_mapping_list:
@@ -240,10 +243,12 @@ class WebShopTask():
             score = json.loads(evaluate_prompt)['score']
         except:
             return -1
-        if score not in range(1,11):
-            return -1
-        else:
+        # if score not in range(1,11):
+        if isinstance(score, (int, float)):
             return score / 10
+        else:
+            return -1
+            # return score / 10
 
 
 class Node:
@@ -349,15 +354,9 @@ def generate_prompt(node):
 def get_value(task, x, y, n_evaluate_sample, user_idx, task_idx, cache_value=True):
     global reflection_map
     global failed_trajectories
-    #unique_trajectories = get_unique_trajectories(failed_trajectories)
-    failed_trajectories = [] if failed_trajectories is None else failed_trajectories#TODO
     value_prompt = task.value_prompt_wrap(x, y, failed_trajectories, reflection_map)
-    # logging.info(f"Current: {x}")
-    # logging.info(f"Current: {y}")
     if cache_value and value_prompt in task.value_cache:
         return task.value_cache[value_prompt]
-    # logging.info(f"VALUE PROMPT: {value_prompt}")
-    # value_outputs = gpt(value_prompt, n=n_evaluate_sample, stop=None)
     value_outputs = env_gpt(value_prompt, user_index=user_idx, task_idx=task_idx, n=n_evaluate_sample, to_print=False, stop=None, response_format={ "type": "json_object" }, model='gpt-3.5-turbo-1106')    
     logging.info(f"VALUE OUTPUTS: {value_outputs}")
     value = task.value_outputs_unwrap(value_outputs)
@@ -393,6 +392,7 @@ def get_samples(task, x, y, n_generate_sample, prompt_sample, stop, user_idx,tas
     else:
         raise ValueError(f'prompt_sample {prompt_sample} not recognized')
     # logging.info(f"PROMPT: {prompt}")
+
     samples = env_gpt(prompt, user_index=user_idx, task_idx=task_idx, n=n_generate_sample, stop=stop, temperature=1.0)
     return [y + _ for _ in samples]
 
@@ -403,7 +403,7 @@ def generate_new_states(node, args, task, user_idx, task_idx, n):
     global failed_trajectories
     prompt = generate_prompt(node)
     #print(prompt)
-    sampled_actions = get_samples(task, prompt, "\nAction: ", n, prompt_sample=args.prompt_sample, stop="Observation", user_idx=user_idx, task_idx=task_idx)
+    sampled_actions = get_samples(task, prompt, "\nAction: ", n, prompt_sample=args.prompt_sample, stop=["Observation", '\n'], user_idx=user_idx, task_idx=task_idx)
     logging.info(f"SAMPLED ACTION: {sampled_actions}")
     unique_states = {}  # Store unique states here
     added = False
@@ -416,6 +416,10 @@ def generate_new_states(node, args, task, user_idx, task_idx, n):
         new_state = node.state.copy()  # Make a copy of the parent node's state
         action_line = next((line.split(":")[1].strip() for line in action.split("\n") if line.startswith("Action") and ":" in line), None)
         action_line = action_line.replace("\\n", "").strip()
+        if action_line=="":
+            continue
+        if not action_line[-1]==']':
+            action_line += ']'
         if action_line != "reset" and (not action_line.startswith("think[")) and (not action_line.startswith("search[")) and (not action_line.startswith("click[")):
             action_line = f"think[{action_line}]"
         
@@ -423,9 +427,6 @@ def generate_new_states(node, args, task, user_idx, task_idx, n):
         # Use thought and action to form a unique key
         unique_key = f"{action_line}"
         
-        # if unique_key in unique_states:
-        #     continue  # Skip if this state already exists
-
         if action_line:
             try:
                 _, all_obs, done, API_success, inter_rwd, all_used_time, all_used_money = env.step(user_idx, task_idx, action_line.strip())
@@ -434,34 +435,10 @@ def generate_new_states(node, args, task, user_idx, task_idx, n):
                 en_pos    = find_single_right_bracket(inter_obs)
                 inter_obs = inter_obs[:en_pos-1] # strip the last '\n'
 
-                inter_obs.replace("[Instruction History]", "")
-                # if action_line == "click[Back to Search]":
-                #     inter_obs = inter_obs[:inter_obs.find('[Search]')-1]
-                #     # print("===")
-                #     # print(inter_obs)
-                #     # print("===")
-                #     try:
-                #         now_instr = re.findall(r'Instruction:  \n(.*)', inter_obs)[0]
-                #     except Exception as e:
-                #         print("&&&&&&&")
-                #         print(inter_obs)
-                #         print("&&&&&&&")
-                #         # return 0, all_used_time, all_used_money#, ret_traj
-                #     # print("===")
-                #     # print(instr)
-                #     # print("===")
-                #     # if len(instr_history) > 0:
-                #     #     inter_obs += "\nInstruction History:"
-                #     #     for idx, instr in enumerate(instr_history):
-                #     #         if idx + 10 >= len(instr_history):
-                #     #             inter_obs += f"\n{idx+1}. {instr}"
-                #     # instr_history.append(now_instr)
-                        
-                #     inter_obs += "\n[Search]"
+                inter_obs = inter_obs.replace("[Instruction History]", "").strip()
+                
                 obs = inter_obs
                 r = inter_rwd
-                # all_used_money += now_used_money
-                # all_used_time += now_used_time
                 logging.info(f"all_used_money: {all_used_money}")
                 logging.info(f"all_used_time: {all_used_time}" )
 
@@ -471,7 +448,7 @@ def generate_new_states(node, args, task, user_idx, task_idx, n):
                 r = -1
                 done = False
             
-            if action.startswith('think'):
+            if action_line.startswith('think'):
                 obs = 'OK.'
       
             # Update the new state dictionary
@@ -506,30 +483,29 @@ def generate_new_states(node, args, task, user_idx, task_idx, n):
 def collect_trajectory(node):
     trajectory = []
     #print("collecting traj", node)
-    
+    question = node.question
     # Append the question from the root node
-    trajectory.append(node.question)
+    # trajectory.append(node.question)
     
     # Collect action and observation from each node till the root
     while node:
+        new_segment = []
         if node.state and 'action' in node.state and node.state['action'] and node.parent:
-            trajectory.append(f"Action: {node.state['action']}")
+            new_segment.append(f"Action: {node.state['action']}")
         else:
             logging.warning(f"Missing or empty action in node at depth {node.depth}")
             
         if node.state and 'observation' in node.state and node.state['observation'] and node.parent:
-            trajectory.append(f"Observation: {node.state['observation']}\n")
+            new_segment.append(f"Observation: {node.state['observation']}")
         else:
             logging.warning(f"Missing or empty observation in node at depth {node.depth}")
-            
+        trajectory.append('\n'.join(new_segment))
         node = node.parent
-    return '\n'.join(trajectory)
+    return question + '\n\n'.join(reversed(trajectory))
 
 
 
 def evaluate_node(node, args, task, user_idx, task_idx):
-    #actions_to_node = collect_actions_to_node(node)
-    #env.restore_state(actions_to_node, idx)
     
     child_prompts = [generate_prompt(child) for child in node.children if not child.is_terminal]
 
@@ -587,10 +563,6 @@ def backpropagate(node, value):
         node.visits += 1
         node.value = (node.value * (node.visits - 1) + value) / node.visits
         logging.info(f"Backpropagating with reward {value} at depth {node.depth}. New value: {node.value}.")
-        # else:
-        #     node.value = (node.value * (node.visits - 1) + value) / node.visits
-        #     logging.info(f"Backpropagating at depth {node.depth}. New value: {node.value}.")
-
         node = node.parent
 
 
@@ -603,7 +575,7 @@ def collect_all_nodes(node):
 
 
 
-def lats_search(args, task, user_idx, task_idx, prompt, iterations=15, to_print=True):
+def lats_search(args, task, user_idx, task_idx, iterations=15, to_print=True):
     print(f"**************USER-{user_idx} TASK-{task_idx}**************")
     global env_gpt
     global failed_trajectories
@@ -613,12 +585,6 @@ def lats_search(args, task, user_idx, task_idx, prompt, iterations=15, to_print=
     global instr_history
     all_used_money, all_used_time = 0, 0
     action = 'reset'
-    init_prompt = prompt
-    prompt = ''
-
-    # gpt = partial(gpt, model=args.backend, temperature=args.temperature)
-
-    # logging.basicConfig(filename=args.log, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filemode='a')
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
@@ -627,39 +593,14 @@ def lats_search(args, task, user_idx, task_idx, prompt, iterations=15, to_print=
             logging.StreamHandler()
         ]
     )
-    #env.sessions[idx] = {'session': idx, 'page_type': 'init'}
     _, all_obs, done, API_success, inter_rwd, now_used_time, now_used_money = env.step(user_idx, task_idx, action)
     st_pos    = all_obs.find('Observation_from_Interactive_Env[\n')
     inter_obs = all_obs[st_pos+len('Observation_from_Interactive_Env[\n'):]
     en_pos    = find_single_right_bracket(inter_obs)
-    inter_obs = inter_obs[:en_pos-1] # strip the last '\n'
-    # inter_obs = inter_obs[:inter_obs.find('[Search]')-1]
-    #         # print("===")
-    #         # print(inter_obs)
-    #         # print("===")
-    # inter_obs.replace("[Instruction History]", "")
-    # try:
-    #     now_instr = re.findall(r'Instruction:  \n(.*)', inter_obs)[0] #TODO
-    # except Exception as e:
-    #     print("&&&&&&&")
-    #     print(inter_obs)
-    #     print("&&&&&&&")
-    #     return 0, all_used_time, all_used_money#, ret_traj
-    # print("===")
-    # print(instr)
-    # print("===")
-    # if len(instr_history) > 0:
-    #     inter_obs += "\nInstruction History:"
-    #     for idx, instr in enumerate(instr_history):
-    #         if idx + 10 >= len(instr_history):
-    #             inter_obs += f"\n{idx+1}. {instr}"
-    # instr_history.append(now_instr)
-    # inter_obs += "\n[Search]"
+    inter_obs = inter_obs[:en_pos-1] #
+    inter_obs = inter_obs.replace("[Instruction History]", "").strip()
+    
     x = inter_obs
-
-    # all_used_time  += now_used_time
-    # all_used_money += now_used_money
-
 
     if to_print:
         print(task_idx, x)
@@ -706,9 +647,6 @@ def lats_search(args, task, user_idx, task_idx, prompt, iterations=15, to_print=
         # Backpropagate reward
         backpropagate(terminal_node, terminal_node.reward)
         
-        #all_nodes.extend(collect_all_nodes(root))
-        #value = evaluate_node(node, args, task, idx)
-        #backpropagate(node, value)
         all_nodes = [(node, node.reward) for node in collect_all_nodes(root)]
         print("searching all nodes...")
         # Check for terminal nodes with a reward of 1
@@ -747,7 +685,7 @@ def parse_args():
     args.add_argument('--iterations', type=int, default=30)
     args.add_argument('--max_depth', type=int, default=15)
     args.add_argument('--log', type=str, default=f'./lats.test.{str(datetime.now()).replace(":","_")}.runtimelogs')
-    args.add_argument('--save_folder', type=str, default='runtime_logs')
+    args.add_argument('--save_folder', type=str, default='runtime_logs_0115')
     args.add_argument('--start_task', type=int, default=0)
     args.add_argument('--task_num', type=int, default=10)
 
@@ -765,7 +703,7 @@ if __name__ == "__main__":
     print(PORT)
     if not os.path.exists(args.save_folder):
         os.makedirs(args.save_folder)
-    args.log = f'./{args.save_folder}/STARTTASK{args.start_task}_lats.test.{str(datetime.now()).replace(":","_")}.runtimelogs'
+    args.log = f'./{args.save_folder}/STARTTASK{args.start_task}_PORT{PORT}_lats.test.{str(datetime.now()).replace(":","_")}.runtimelogs'
     file_name    = f"./{args.save_folder}/lats_cwebshopRunTimeEnvSession_L{L}_USER{USER_NUM}_STARTTASK{args.start_task}_PORT{PORT}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"
     task = WebShopTask()
     # print(task)
@@ -809,25 +747,5 @@ if __name__ == "__main__":
         print(f"\tSuccess Rate   = {success_rate/TASK_NUM}"     , file=logfile)
         print(f"\tAvg Used Time  = {avg_time/TASK_NUM}"         , file=logfile)
         print(f"\tAvg Used Money = {avg_money/TASK_NUM}"        , file=logfile)
-
-        
-         # log main metric
-        # task_accs.append(em)
-        # print("best reward", reward)
-        # # cnt_avg = sum(task_accs) / len(task_accs)
-        # # print(i, 'len(task_accs)', len(task_accs), 'cnt_avg', cnt_avg, '\n')
-        # task_accs.append(reward)
-        # if (i+1) % 1 == 0:
-        #     r, sr, fr = sum(task_accs) / len(task_accs), len([_ for _ in task_accs if _ == 1]) / len(task_accs), count / len(task_accs)
-        #     print(i+1, r, sr, fr)
-        #     print('-------------')
-        # r, sr, fr = sum(task_accs) / len(task_accs), len([_ for _ in task_accs if _ == 1]) / n, count / n
-        # print(r, sr, fr)
-        # print("all_used_money", all_used_money)
-        # print("all_used_time", all_used_time)
-
-        # logging.info(f"RESULTS: {r}, {sr}, {fr}")
-        # logging.info(f"all_used_money: {all_used_money}")
-        # print()
 
     

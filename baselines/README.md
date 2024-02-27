@@ -42,17 +42,19 @@ Ensure that the actions you generate are valid and contextually appropriate for 
 
 ## Baselines Example
 
-We provide four example baselines on the **UA**$^2$-Webshop:
+We provide several baselines on the **UA**$^2$-Webshop:
 - `react.py`
 - `react_sc.py`
 - `cot_sc.py`
 - `cot_least_to_most.py`
+- `lats/`
+- `reflexion/`
 
 Each example follows these steps:
 - [Step1] Execute action.
 - [Step2] Obtain the next action from the LLM.
   - [Step2.1] Generate the prompt for the LLM.
-  - [Step2.2] Retrieve the action from the LLM.
+  - [Step2.2] Get the action from the LLM.
 
 Search for "# [*]" in the code to find these sections easily.
 
@@ -74,10 +76,32 @@ export OPENAI_API_KEY=<your_openai_api_key>
 
 ### Running the Baselines
 
-Execute any baseline example using the command:
+Execute baseline examples except LATS and Reflexion using the command:
 
 ```shell
 python <example.py>
 ```
 
 Replace `<example.py>` with the desired baseline script.
+
+To execute LATS and Reflexion, firstly switch working directory and run the test scripts:
+```shell
+# LATS
+cd lats
+./lats.sh
+
+# Reflexion
+cd reflexion
+./reflexion.sh
+```
+
+### Evaluation of alignment gap in Section 4.3 of the paper [**UA**$^2$](https://arxiv.org/abs/2402.07744)
+To evaluate alignment gap, we need evaluate the corresponding agent on the ablated version of **UA**$^2$-Webshop. We can achieve this by import different env class from different python file.
+- $\mathbf{G}_{\mathrm{ED}}$:
+```python
+from environments.env_instr_list_cwebshop_runtime import cwebshopRunTimeEnv
+```
+- $\mathbf{G}_{\mathrm{ED}}$:
+```python
+from environments.env_instr_list_cwebshop_runtime_session_d import cwebshopRunTimeEnv
+```
