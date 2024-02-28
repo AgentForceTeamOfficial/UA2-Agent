@@ -6,7 +6,7 @@ from webshop_trial import run_trial
 from generate_reflections import update_memory
 
 from typing import Any, List, Dict
-from environments.env_instr_list_cwebshop_runtime_session import cwebshopRunTimeEnv
+from environments.env_instr_list_ua2webshop_runtime_session import ua2webshopRunTimeEnv
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -87,7 +87,7 @@ def main(args) -> None:
     Sending all logs to `{args.run_name}`
     -----
     """)
-    env = cwebshopRunTimeEnv(init_money=10000, init_time=10000)
+    env = ua2webshopRunTimeEnv(init_money=10000, init_time=10000)
     # run trials
     trial_idx = args.start_trial_num
     while trial_idx < args.num_trials:

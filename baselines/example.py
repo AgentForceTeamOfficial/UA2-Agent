@@ -2,9 +2,9 @@ from datetime import datetime
 import sys
 
 sys.path.append(".")
-from environments.env_instr_list_cwebshop_runtime_session import cwebshopRunTimeEnv
+from environments.env_instr_list_ua2webshop_runtime_session import ua2webshopRunTimeEnv
 
-env = cwebshopRunTimeEnv(init_money=10000, init_time=10000)
+env = ua2webshopRunTimeEnv(init_money=10000, init_time=10000)
 
 def find_single_right_bracket(str0):
     """
@@ -24,11 +24,11 @@ def find_single_right_bracket(str0):
 
 def get_next_action(inter_obs):
     if "[Search]" in inter_obs:
-        return "search[Hello C-Webshop!]"
+        return "search[Hello UA2-Webshop!]"
     else:
         return "click[Back to Search]"
 
-def cwebshop_run(
+def ua2webshop_run(
     user_idx,
     task_idx,
     prompt,
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     L = 0
     USER_NUM = 10
     TASK_NUM = 50
-    file_name = f"./runtime_logs/cwebshopRunTimeEnvSession_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"  # log file for results
+    file_name = f"./runtime_logs/ua2webshopRunTimeEnvSession_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"  # log file for results
     avg_reward = []
     success_rate = []
     avg_time = []
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         instr_history = []
         for j in range(TASK_NUM):
             print(f"Now user_{i} task_{j}")
-            rwd, all_used_time, all_used_money = cwebshop_run(
+            rwd, all_used_time, all_used_money = ua2webshop_run(
                 i,
                 j,
                 init_prompt,

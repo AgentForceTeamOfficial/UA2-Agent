@@ -82,7 +82,7 @@ instruction. The key actions are extracted from the high-reward trajectories wit
   - `react_w_insights_w_profiler_v1benchmark.py`: the implementation of our **UA**$^2$-Agent algorithm on **UA**$^2$-Webshop benchmark
 
 - `./environments`: running environment of our **UA**$^2$-Webshop benchmark (the encapsulation of our core environment)
-  - `env_instr_list_cwebshop_runtime_session.py`: the capsule of run-time environment leveraging cost information for **UA**$^2$-Webshop benchmark
+  - `env_instr_list_ua2webshop_runtime_session.py`: the capsule of run-time environment leveraging cost information for **UA**$^2$-Webshop benchmark
 
 - `./baselines`: source code of baselines
   - `README.md`: the instruction of how to run baselines and implementation details

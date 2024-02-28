@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Comment
 from env_history import EnvironmentHistory
 sys.path.append("../../")
-from environments.env_instr_list_cwebshop_runtime import cwebshopRunTimeEnv
+from environments.env_instr_list_ua2webshop_runtime import ua2webshopRunTimeEnv
 
 from typing import Any, Dict, List, Tuple
  
@@ -45,7 +45,7 @@ def tag_visible(element):
         element.parent.name not in ignore and not isinstance(element, Comment)
     )
 
-def cwebshop_run(user_idx, task_idx, env, base_prompt, memory: List[str], to_print=True, model="gpt-3.5-turbo-instruct-0914") -> Tuple[EnvironmentHistory, bool]:
+def ua2webshop_run(user_idx, task_idx, env, base_prompt, memory: List[str], to_print=True, model="gpt-3.5-turbo-instruct-0914") -> Tuple[EnvironmentHistory, bool]:
     action = 'reset'
     init_prompt = base_prompt
     prompt = ''
@@ -139,7 +139,7 @@ def run_trial(env,
             continue
 
         try:
-            final_env_history, is_success, rwd, all_used_time, all_used_money = cwebshop_run(env_config['user_idx'], z, env, BASE_PROMPT, env_config["memory"] if use_memory else [], to_print=True)
+            final_env_history, is_success, rwd, all_used_time, all_used_money = ua2webshop_run(env_config['user_idx'], z, env, BASE_PROMPT, env_config["memory"] if use_memory else [], to_print=True)
             
             env_config['all_used_money'] = all_used_money
             env_config['all_used_time'] = all_used_time

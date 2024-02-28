@@ -6,13 +6,13 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 from prompt_lib import *
 sys.path.append("../")
-from environments.env_instr_list_cwebshop_runtime_session_d import cwebshopRunTimeEnv
+from environments.env_instr_list_ua2webshop_runtime_session_d import ua2webshopRunTimeEnv
 from environments.apis import OpenAI_API_Calling, num_tokens_from_messages
 from prompt_lib import ReAct_PROMPT_1shot
 from Profiler import MultiRoundProfiler
 from Insight import Insight
 
-env = cwebshopRunTimeEnv(init_money=10000, init_time=10000)
+env = ua2webshopRunTimeEnv(init_money=10000, init_time=10000)
 
 def find_single_right_bracket(str0):
     bracket_cnt = 1
@@ -26,7 +26,7 @@ def num_tokens(prompt, model='gpt-3.5-turbo-instruct-0914'):
     num, _, _ = num_tokens_from_messages(prompt, model)
     return num
 
-def cwebshop_run(user_idx, task_idx, instruction_history:list, prompt, profiler, logfile, to_print=False, model="gpt-3.5-turbo-instruct-0914"):
+def ua2webshop_run(user_idx, task_idx, instruction_history:list, prompt, profiler, logfile, to_print=False, model="gpt-3.5-turbo-instruct-0914"):
     print(f"**************USER-{user_idx} TASK-{task_idx}**************")
     
     action = 'reset'
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     L            = 0
     USER_NUM     = 10
     TASK_NUM     = 50
-    file_name      = f"../runtime_logs/react_w_insight_w_profile_cwebshopRunTimeEnv_o_history_v1d_U{USER_NUM}_T{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"
+    file_name      = f"../runtime_logs/react_w_insight_w_profile_ua2webshopRunTimeEnv_o_history_v1d_U{USER_NUM}_T{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"
     avg_reward   = []
     success_rate = []
     avg_time     = []
@@ -203,7 +203,7 @@ if __name__ == "__main__":
             else:
                 logfile = open(file_name, "a")
 
-            profiler, instruction, rwd, all_used_time, all_used_money, click_insights = cwebshop_run(i, j, instructions[-instr_history_window_size:], prompt1, profiler, logfile=logfile, to_print=to_print)
+            profiler, instruction, rwd, all_used_time, all_used_money, click_insights = ua2webshop_run(i, j, instructions[-instr_history_window_size:], prompt1, profiler, logfile=logfile, to_print=to_print)
             instructions.append(instruction)
             avg_reward[i]   += rwd
             success_rate[i] += (rwd == 1.0)

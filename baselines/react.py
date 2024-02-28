@@ -4,10 +4,10 @@ import time
 from datetime import datetime
 import sys
 sys.path.append("../")
-from environments.env_instr_list_cwebshop_runtime_session import cwebshopRunTimeEnv
+from environments.env_instr_list_ua2webshop_runtime_session import ua2webshopRunTimeEnv
 from environments.apis import num_tokens_from_messages
 
-env = cwebshopRunTimeEnv(init_money=10000, init_time=10000)
+env = ua2webshopRunTimeEnv(init_money=10000, init_time=10000)
 
 def find_single_right_bracket(str0):
     """
@@ -32,7 +32,7 @@ def num_tokens(prompt, model='gpt-3.5-turbo-instruct-0914'):
     num, _, _ = num_tokens_from_messages(prompt, model)
     return num
 
-def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, model="gpt-3.5-turbo-instruct-0914"):
+def ua2webshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, model="gpt-3.5-turbo-instruct-0914"):
     action = 'reset'
     init_prompt = prompt
     prompt = ''
@@ -149,7 +149,7 @@ def cwebshop_run(user_idx, task_idx, prompt, instr_history, to_print=False, mode
     return 0, all_used_time, all_used_money
 
 if __name__ == "__main__":
-    init_prompt  = """C-Webshop
+    init_prompt  = """UA2-Webshop
 Instruction:
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars
 [Search]
@@ -201,7 +201,7 @@ Action: click[Buy Now]
     L            = 0
     USER_NUM     = 10
     TASK_NUM     = 50  
-    file_name    = f"../runtime_logs/react_5000_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"               # log file for results
+    file_name    = f"../runtime_logs/react_ua2webshopRunTimeEnv_L{L}_USER{USER_NUM}_TASK{TASK_NUM}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"               # log file for results
     avg_reward   = []
     success_rate = []
     avg_time     = []
@@ -215,7 +215,7 @@ Action: click[Buy Now]
         instr_history = []
         for j in range(TASK_NUM):
             print(f"Now user_{i} task_{j}")
-            rwd, all_used_time, all_used_money = cwebshop_run(i, j, init_prompt, instr_history, to_print=to_print)
+            rwd, all_used_time, all_used_money = ua2webshop_run(i, j, init_prompt, instr_history, to_print=to_print)
             avg_reward[i]   += rwd
             success_rate[i] += (rwd == 1.0)
             avg_time[i]     += all_used_time

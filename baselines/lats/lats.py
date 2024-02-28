@@ -3,7 +3,7 @@ import copy
 import sys
 sys.path.append('../../')
 from environments.apis import num_tokens_from_messages
-from environments.env_instr_list_cwebshop_runtime_session import cwebshopRunTimeEnv, WEBSHOP_URL
+from environments.env_instr_list_ua2webshop_runtime_session import ua2webshopRunTimeEnv, WEBSHOP_URL
 
 import argparse
 from datetime import datetime
@@ -16,7 +16,7 @@ import time
 from lats_prompts import *
 import re, random, ast, os
 
-env = cwebshopRunTimeEnv(init_money=10000, init_time=10000)
+env = ua2webshopRunTimeEnv(init_money=10000, init_time=10000)
 global reflection_map
 global failed_trajectories
 global all_used_money
@@ -704,7 +704,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.save_folder):
         os.makedirs(args.save_folder)
     args.log = f'./{args.save_folder}/STARTTASK{args.start_task}_PORT{PORT}_lats.test.{str(datetime.now()).replace(":","_")}.runtimelogs'
-    file_name    = f"./{args.save_folder}/lats_cwebshopRunTimeEnvSession_L{L}_USER{USER_NUM}_STARTTASK{args.start_task}_PORT{PORT}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"
+    file_name    = f"./{args.save_folder}/lats_ua2webshopRunTimeEnvSession_L{L}_USER{USER_NUM}_STARTTASK{args.start_task}_PORT{PORT}_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.txt"
     task = WebShopTask()
     # print(task)
     count = 0

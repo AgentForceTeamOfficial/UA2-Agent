@@ -3,13 +3,15 @@ import json
 import time
 import requests
 import urllib
+import random
+import string
 import re
 
 # Parse the web page
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 
-WEBSHOP_URL = "<path to the env without HI>"
+WEBSHOP_URL = "<path to the env without ED>"
 ACTION_TO_TEMPLATE = {
     "Description": "description_page.html",
     "Features": "features_page.html",
@@ -33,6 +35,7 @@ ACTION_TO_TIME = {
 }
 INVALID_TIME = 0.3234
 
+
 def clean_str(p):
     return p.encode().decode("unicode-escape").encode("latin1").decode("utf-8")
 
@@ -42,9 +45,10 @@ def tag_visible(element):
     return element.parent.name not in ignore and not isinstance(element, Comment)
 
 
-def cwebshop_text(
+def ua2webshop_text(
     user_idx,
     task_idx,
+    session,
     page_type,
     query_string="",
     page_num=1,
@@ -69,7 +73,7 @@ def cwebshop_text(
         url = f"{WEBSHOP_URL}/done/{user_idx}/{task_idx}/{asin}/{quoted_options}"
     while True:
         try:
-            html = requests.get(url).text
+            html = session.get(url).text
             html_obj = BeautifulSoup(html, "html.parser")
             texts = html_obj.findAll(text=True)
             visible_texts = list(filter(tag_visible, texts))
@@ -143,19 +147,45 @@ def cwebshop_text(
         url = url[url.find("%7B") + 3 :]
         url = url.split("%27%3A")
         for i in range(1, len(url)):
-            clicked_tag = url[i][6:][:url[i][6:].find("%27")]
+            clicked_tag = url[i][6:][: url[i][6:].find("%27")]
             clicked_tag = urllib.parse.unquote(clicked_tag)
             if clicked_tag in observation:
-                observation = observation[: observation.find(clicked_tag) + len(clicked_tag) + 1] + "(have clicked) " + observation[observation.find(clicked_tag) + len(clicked_tag) + 1:]
+                observation = (
+                    observation[: observation.find(clicked_tag) + len(clicked_tag) + 1]
+                    + "(have clicked) "
+                    + observation[
+                        observation.find(clicked_tag) + len(clicked_tag) + 1 :
+                    ]
+                )
         return clean_str(observation), info, initial_url
 
 
-class cwebshopEnv:
+class ua2webshopEnv:
     def __init__(self):
         self.sessions = {}
 
         self.user_idx = -1
         self.task_idx = -1
+
+        while True:
+            try:
+                self.session = requests.session()
+                self.session.keep_alive = False
+                data = {
+                    "username_query": "".join(
+                        random.choice(string.ascii_letters) for _ in range(32)
+                    )
+                }
+                url = WEBSHOP_URL + "/login"
+                _ = self.session.post(
+                    url=url,
+                    data=data,
+                )
+                print(self.session.cookies, type(self.session.cookies))
+                break
+            except Exception as e:
+                print(e)
+                continue
 
     def interactive_env_step(self, action):
         reward = 0.0
@@ -287,9 +317,9 @@ class cwebshopEnv:
             else:
                 # print("tag4")
                 assert False
-            # print("cwebshop_text")
-            observation_, info, current_url = cwebshop_text(
-                **self.sessions[self.user_idx][self.task_idx]
+            # print("ua2webshop_text")
+            observation_, info, current_url = ua2webshop_text(
+                session=self.session, **self.sessions[self.user_idx][self.task_idx]
             )
             if observation_:
                 # print("observation = observation_")
@@ -304,7 +334,7 @@ class cwebshopEnv:
         return observation, reward, done, current_url
 
 
-class cwebshopRunTimeEnv(cwebshopEnv):
+class ua2webshopRunTimeEnv(ua2webshopEnv):
     def __init__(self, init_money, init_time) -> None:
         super().__init__()
         self.init_money = init_money
@@ -385,17 +415,18 @@ gpt-3.5-turbo-instruct-0914 (Instruct Completion Model).\nTo seek its advice, pl
                 except:
                     isValid = False
 
-                if (prompt_spt[0] in ALL_AVAILABLE_MODELS) and isValid and action.startswith("ask["):
+                if (
+                    (prompt_spt[0] in ALL_AVAILABLE_MODELS)
+                    and isValid
+                    and action.startswith("ask[")
+                ):
                     response, cost, success, ttime = OpenAI_API_Calling(
                         prompt_spt[1], model=prompt_spt[0], kwargs_dict=kwargs_dict
                     )
                     if len(response) > 0:
                         response = json.dumps(response)
                     runtime_obs = (
-                        f"LLM_response[{response.strip()}]"
-                        + "\n"
-                        + "==" * 20
-                        + "\n"
+                        f"LLM_response[{response.strip()}]" + "\n" + "==" * 20 + "\n"
                     )
                     API_success = success
                     ttime = 0.0
@@ -404,7 +435,9 @@ gpt-3.5-turbo-instruct-0914 (Instruct Completion Model).\nTo seek its advice, pl
                     runtime_obs = "Invalid Action!" + "\n" + "==" * 20 + "\n"
                     API_success = False
             else:
-                inter_obs, inter_rwd, inter_done, current_url = self.interactive_env_step(action)
+                inter_obs, inter_rwd, inter_done, current_url = (
+                    self.interactive_env_step(action)
+                )
                 if inter_obs == "Invalid Action!":
                     ttime = INVALID_TIME
                 else:
@@ -458,7 +491,7 @@ gpt-3.5-turbo-instruct-0914 (Instruct Completion Model).\nTo seek its advice, pl
 
 
 if __name__ == "__main__":
-    env = cwebshopRunTimeEnv(init_money=10000, init_time=10000)
+    env = ua2webshopRunTimeEnv(init_money=10000, init_time=10000)
 
     user_idx = 0
     task_idx = 10
@@ -467,6 +500,7 @@ if __name__ == "__main__":
     url, all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
         user_idx, task_idx, "reset"
     )
+    print(f"URL: {url}")
     print(f"Observation: {all_obs}")
     print(f"Done: {done}")
     print(f"API Success: {API_success}")
@@ -478,6 +512,7 @@ if __name__ == "__main__":
     url, all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
         user_idx, task_idx, "click[Instruction History]"
     )
+    print(f"URL: {url}")
     print(f"Observation: {all_obs}")
     print(f"Done: {done}")
     print(f"API Success: {API_success}")
@@ -489,6 +524,7 @@ if __name__ == "__main__":
     url, all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
         user_idx, task_idx, "click[Back to Search]"
     )
+    print(f"URL: {url}")
     print(f"Observation: {all_obs}")
     print(f"Done: {done}")
     print(f"API Success: {API_success}")
@@ -497,9 +533,12 @@ if __name__ == "__main__":
     print(f"Cost Money: {cost_money}")
 
     print("====== Search =======")
-    all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
-        user_idx, task_idx, "search[3 ounce bright citrus deodorant sensitive skin]"
+    url, all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
+        user_idx,
+        task_idx,
+        "search[cute sulfate paraben free shampoo for sensitive skin]",
     )
+    print(f"URL: {url}")
     print(f"Observation: {all_obs}")
     print(f"Done: {done}")
     print(f"API Success: {API_success}")
@@ -508,9 +547,10 @@ if __name__ == "__main__":
     print(f"Cost Money: {cost_money}")
 
     print("====== Click Item =======")
-    all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
-        user_idx, task_idx, "click[B078GWRC1J]"
+    url, all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
+        user_idx, task_idx, "click[B00JF3S29Y]"
     )
+    print(f"URL: {url}")
     print(f"Observation: {all_obs}")
     print(f"Done: {done}")
     print(f"API Success: {API_success}")
@@ -518,21 +558,11 @@ if __name__ == "__main__":
     print(f"Cost Time: {cost_time}")
     print(f"Cost Money: {cost_money}")
 
-    print("====== Click bright citrus =======")
-    all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
-        user_idx, task_idx, "click[bright citrus]"
+    print("====== Click 8 fl oz =======")
+    url, all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
+        user_idx, task_idx, "click[8 fl oz]"
     )
-    print(f"Observation: {all_obs}")
-    print(f"Done: {done}")
-    print(f"API Success: {API_success}")
-    print(f"Interactive Reward: {inter_rwd}")
-    print(f"Cost Time: {cost_time}")
-    print(f"Cost Money: {cost_money}")
-
-    print("====== Click 3 ounce (pack of 1) =======")
-    all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
-        user_idx, task_idx, "click[3 ounce (pack of 1)]"
-    )
+    print(f"URL: {url}")
     print(f"Observation: {all_obs}")
     print(f"Done: {done}")
     print(f"API Success: {API_success}")
@@ -544,6 +574,7 @@ if __name__ == "__main__":
     url, all_obs, done, API_success, inter_rwd, cost_time, cost_money = env.step(
         user_idx, task_idx, "click[Buy Now]"
     )
+    print(f"URL: {url}")
     print(f"Observation: {all_obs}")
     print(f"Done: {done}")
     print(f"API Success: {API_success}")

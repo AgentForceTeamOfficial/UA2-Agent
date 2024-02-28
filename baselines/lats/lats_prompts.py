@@ -1,4 +1,4 @@
-ReAct_PROMPT_1shot = """C-Webshop 
+ReAct_PROMPT_1shot = """UA2-Webshop
 Instruction:  
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars 
 [Search]  
@@ -50,7 +50,7 @@ Action: click[Buy Now]
 """
 
 
-prompt1 = """C-Webshop 
+prompt1 = """UA2-Webshop
 Instruction:  
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars 
 [Search]  
@@ -161,7 +161,7 @@ score_prompt = '''Given an item to purchase and a trajectory that aims to buy an
 
 Here are some examples
 
-C-Webshop
+UA2-Webshop
 Instruction:
 i am looking for dairy free and apple variety pack of chips, and price lower than 30.00 dollars
 [Search]
@@ -211,7 +211,7 @@ Action: click[Buy Now]
 Reflection: In this attempt, I was unsuccessful. I accidentally bought a product that was $100, which is more than my budget of $30. Either way, the initial search results were not good. Next time, I will do search["variety pack of chips"] and then check if the results meet the dairy free and the $30 budget constraints. I will continue to refine my searches so that I can find more products.
 Thus the correctness score is 5
 
-C-Webshop 
+UA2-Webshop
 Instruction:  
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars 
 [Search]  
@@ -245,7 +245,7 @@ Now it's your turn, make sure that your answer is formatted in a json format: {{
 score_prompt_feedback = '''Given an item to purchase and a trajectory, analyze the following trajectory, then at the last line conclude "Thus the correctness score is s", where s is an integer from 1 to 10. Please format your answer in a json file with the following format: {{"score": s, "feedback": "your feedback here"}}.
 Here are some examples
 
-C-Webshop
+UA2-Webshop
 Instruction:
 i am looking for dairy free and apple variety pack of chips, and price lower than 30.00 dollars
 [Search]
@@ -295,7 +295,7 @@ Action: click[Buy Now]
 Reflection: In this attempt, I was unsuccessful. I accidentally bought a product that was $100, which is more than my budget of $30. Either way, the initial search results were not good. Next time, I will do search["variety pack of chips"] and then check if the results meet the dairy free and the $30 budget constraints. I will continue to refine my searches so that I can find more products.
 Thus the correctness score is 5
 
-C-Webshop 
+UA2-Webshop
 Instruction:  
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars 
 [Search]  
@@ -328,7 +328,7 @@ Now it's your turn, make sure that your answer is formatted in a json format: {{
 '''
 
 # trivial search & item, choose option
-prompt1_actonly = """C-Webshop 
+prompt1_actonly = """UA2-Webshop
 Instruction:  
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars 
 [Search]  

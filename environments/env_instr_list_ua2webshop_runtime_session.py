@@ -35,6 +35,7 @@ ACTION_TO_TIME = {
 }
 INVALID_TIME = 0.3234
 
+
 def clean_str(p):
     return p.encode().decode("unicode-escape").encode("latin1").decode("utf-8")
 
@@ -44,7 +45,7 @@ def tag_visible(element):
     return element.parent.name not in ignore and not isinstance(element, Comment)
 
 
-def cwebshop_text(
+def ua2webshop_text(
     user_idx,
     task_idx,
     session,
@@ -146,14 +147,20 @@ def cwebshop_text(
         url = url[url.find("%7B") + 3 :]
         url = url.split("%27%3A")
         for i in range(1, len(url)):
-            clicked_tag = url[i][6:][:url[i][6:].find("%27")]
+            clicked_tag = url[i][6:][: url[i][6:].find("%27")]
             clicked_tag = urllib.parse.unquote(clicked_tag)
             if clicked_tag in observation:
-                observation = observation[: observation.find(clicked_tag) + len(clicked_tag) + 1] + "(have clicked) " + observation[observation.find(clicked_tag) + len(clicked_tag) + 1:]
+                observation = (
+                    observation[: observation.find(clicked_tag) + len(clicked_tag) + 1]
+                    + "(have clicked) "
+                    + observation[
+                        observation.find(clicked_tag) + len(clicked_tag) + 1 :
+                    ]
+                )
         return clean_str(observation), info, initial_url
 
 
-class cwebshopEnv:
+class ua2webshopEnv:
     def __init__(self):
         self.sessions = {}
 
@@ -310,8 +317,8 @@ class cwebshopEnv:
             else:
                 # print("tag4")
                 assert False
-            # print("cwebshop_text")
-            observation_, info, current_url = cwebshop_text(
+            # print("ua2webshop_text")
+            observation_, info, current_url = ua2webshop_text(
                 session=self.session, **self.sessions[self.user_idx][self.task_idx]
             )
             if observation_:
@@ -327,7 +334,7 @@ class cwebshopEnv:
         return observation, reward, done, current_url
 
 
-class cwebshopRunTimeEnv(cwebshopEnv):
+class ua2webshopRunTimeEnv(ua2webshopEnv):
     def __init__(self, init_money, init_time) -> None:
         super().__init__()
         self.init_money = init_money
@@ -408,17 +415,18 @@ gpt-3.5-turbo-instruct-0914 (Instruct Completion Model).\nTo seek its advice, pl
                 except:
                     isValid = False
 
-                if (prompt_spt[0] in ALL_AVAILABLE_MODELS) and isValid and action.startswith("ask["):
+                if (
+                    (prompt_spt[0] in ALL_AVAILABLE_MODELS)
+                    and isValid
+                    and action.startswith("ask[")
+                ):
                     response, cost, success, ttime = OpenAI_API_Calling(
                         prompt_spt[1], model=prompt_spt[0], kwargs_dict=kwargs_dict
                     )
                     if len(response) > 0:
                         response = json.dumps(response)
                     runtime_obs = (
-                        f"LLM_response[{response.strip()}]"
-                        + "\n"
-                        + "==" * 20
-                        + "\n"
+                        f"LLM_response[{response.strip()}]" + "\n" + "==" * 20 + "\n"
                     )
                     API_success = success
                     ttime = 0.0
@@ -427,7 +435,9 @@ gpt-3.5-turbo-instruct-0914 (Instruct Completion Model).\nTo seek its advice, pl
                     runtime_obs = "Invalid Action!" + "\n" + "==" * 20 + "\n"
                     API_success = False
             else:
-                inter_obs, inter_rwd, inter_done, current_url = self.interactive_env_step(action)
+                inter_obs, inter_rwd, inter_done, current_url = (
+                    self.interactive_env_step(action)
+                )
                 if inter_obs == "Invalid Action!":
                     ttime = INVALID_TIME
                 else:
@@ -481,7 +491,7 @@ gpt-3.5-turbo-instruct-0914 (Instruct Completion Model).\nTo seek its advice, pl
 
 
 if __name__ == "__main__":
-    env = cwebshopRunTimeEnv(init_money=10000, init_time=10000)
+    env = ua2webshopRunTimeEnv(init_money=10000, init_time=10000)
 
     user_idx = 0
     task_idx = 10

@@ -23,7 +23,7 @@ Reason: ##
 INSIGHT_REDUNDANCY_PROMPT = """You will be provided a trajectory of webshop. Note that some actions may be redundant. Please identify the key and the redundant actions, and explain the reasons.
 Here is an example:
 
-C-Webshop 
+UA2-Webshop
 Instruction:  
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars 
 [Search]  
@@ -92,7 +92,7 @@ redundant_actions_id: [#action_id#]
 reason: ##
 """
 
-ReAct_PROMPT_1shot = """C-Webshop 
+ReAct_PROMPT_1shot = """UA2-Webshop
 Instruction:  
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars 
 [Search]  
@@ -143,7 +143,7 @@ Action: click[Buy Now]
 
 
 ReAct_PROMPT_1shot_Explore = """Note that your admission is not only finish the task but also 
-C-Webshop 
+UA2-Webshop
 Instruction:  
 i would like a 3 ounce bottle of bright citrus deodorant for sensitive skin, and price lower than 50.00 dollars 
 [Search]  

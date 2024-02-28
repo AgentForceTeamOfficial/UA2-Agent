@@ -14,7 +14,7 @@ export OPENAI_API_KEY=<your_openai_api_key>
 
 ### Step1: Execute action
 
-Use `cwebshopRunTimeEnv.step(user_idx, task_idx, action, url_log_file=None)` to execute an action.
+Use `ua2webshopRunTimeEnv.step(user_idx, task_idx, action, url_log_file=None)` to execute an action.
 
 Parameters:
 - `user_idx`: Index of the user.
@@ -99,9 +99,9 @@ cd reflexion
 To evaluate alignment gap, we need evaluate the corresponding agent on the ablated version of **UA**$^2$-Webshop. We can achieve this by import different env class from different python file.
 - $\mathbf{G}_{\mathrm{ED}}$:
 ```python
-from environments.env_instr_list_cwebshop_runtime import cwebshopRunTimeEnv
+from environments.env_instr_list_ua2webshop_runtime import ua2webshopRunTimeEnv
 ```
 - $\mathbf{G}_{\mathrm{ED}}$:
 ```python
-from environments.env_instr_list_cwebshop_runtime_session_d import cwebshopRunTimeEnv
+from environments.env_instr_list_ua2webshop_runtime_session_d import ua2webshopRunTimeEnv
 ```
