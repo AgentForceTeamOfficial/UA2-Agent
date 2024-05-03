@@ -17,7 +17,6 @@ $$$$
 
 🎡 **Methods used for comparison**:
 
-<!-- - [**CoT-SC**](https://arxiv.org/abs/2203.11171): Sampling diverse [Chain-of-Thought reasoning](https://arxiv.org/abs/2201.11903) paths and action candidates, and voting for the majority to enhance self-consistency. -->
 - [**ReAct**](https://arxiv.org/abs/2210.03629): On each step, the agent decides whether to take actions or reason about the query based on the current state.
 - [**ReACT-SC**](https://arxiv.org/abs/2203.11171): Instead of Chain-of-Thought reasoning, we apply self-consistency strategy to ReAct to further improve the performance.
 - [**Reflexion**](https://arxiv.org/abs/2303.11366): Using verbal feedback as the reflecion signal for agents. In this case, we follow the external reward as the feedback directly from the environment, following its original setting.  
@@ -163,7 +162,13 @@ This project is advised by [Peng Li](https://www.lpeng.net/) (lipeng@air.tsinghu
 
 We look forward to all kinds of suggestions from anyone interested in our project with whatever backgrounds! Either PRs, issues, or leaving a message is welcomed. We'll be sure to follow up shortly!
 
-<!-- ## If you find this repo useful, please cite our project:
+## If you find this repo useful, please cite our project:
 
 ```bibtex
-``` -->
+@article{yang2024towards,
+   title = {Towards Unified Alignment Between Agents, Humans, and Environment},
+   author = {Yang, Zonghan and Liu, An and Liu, Zijun and Liu, Kaiming and Xiong, Fangzhou and Wang, Yile and Yang, Zeyuan and Hu, Qingyuan and Chen, Xinrui and Zhang, Zhenhe and Luo, Fuwen and Guo, Zhicheng and Li, Peng and Liu, Yang},
+   journal={arXiv preprint arXiv:2402.07744},
+   year = {2024}
+}
+```
