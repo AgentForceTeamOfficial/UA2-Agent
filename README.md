@@ -4,6 +4,18 @@
 > 🚀 This repo implements the preliminary version of agents designed under **U**nified **A**lignment for **A**gents (**UA**$^2$) framework with results benchmarked on [**UA**$^2$-Webshop](https://github.com/AgentForceTeamOfficial/**UA**$^2$-Webshop).  
 > 🚀 The project is a practice of LLM-powered agent framework design under the guidance of [*Towards Unified Alignment Between Agents, Humans, and Environment*](https://agent-force.github.io/unified-alignment-for-agents.html).
 
+If you find this repo useful, please cite our project:
+
+```bibtex
+@article{yang2024towards,
+   title = {Towards Unified Alignment Between Agents, Humans, and Environment},
+   author = {Yang, Zonghan and Liu, An and Liu, Zijun and Liu, Kaiming and Xiong, Fangzhou and Wang, Yile and Yang, Zeyuan and Hu, Qingyuan and Chen, Xinrui and Zhang, Zhenhe and Luo, Fuwen and Guo, Zhicheng and Li, Peng and Liu, Yang},
+   journal={arXiv preprint arXiv:2402.07744},
+   year = {2024}
+}
+```
+
+
 
 ## Performance Comparison on **UA**$^2$-Webshop
 
@@ -161,14 +173,3 @@ This project is advised by [Peng Li](https://www.lpeng.net/) (lipeng@air.tsinghu
 ## Contributions
 
 We look forward to all kinds of suggestions from anyone interested in our project with whatever backgrounds! Either PRs, issues, or leaving a message is welcomed. We'll be sure to follow up shortly!
-
-## If you find this repo useful, please cite our project:
-
-```bibtex
-@article{yang2024towards,
-   title = {Towards Unified Alignment Between Agents, Humans, and Environment},
-   author = {Yang, Zonghan and Liu, An and Liu, Zijun and Liu, Kaiming and Xiong, Fangzhou and Wang, Yile and Yang, Zeyuan and Hu, Qingyuan and Chen, Xinrui and Zhang, Zhenhe and Luo, Fuwen and Guo, Zhicheng and Li, Peng and Liu, Yang},
-   journal={arXiv preprint arXiv:2402.07744},
-   year = {2024}
-}
-```
