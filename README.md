@@ -1,7 +1,7 @@
 # Agents under **U**nified **A**lignment for **A**gents (**UA**$^2$) Framework
 
 
-> 🚀 This repo implements the preliminary version of agents designed under **U**nified **A**lignment for **A**gents (**UA**$^2$) framework with results benchmarked on [**UA**$^2$-Webshop](https://github.com/AgentForceTeamOfficial/**UA**$^2$-Webshop).  
+> 🚀 This repo implements the preliminary version of agents designed under **U**nified **A**lignment for **A**gents (**UA**$^2$) framework with results benchmarked on [**UA**$^2$-Webshop](https://github.com/AgentForceTeamOfficial/UA2-WebShop).  
 > 🚀 The project is a practice of LLM-powered agent framework design under the guidance of [*Towards Unified Alignment Between Agents, Humans, and Environment*](https://agent-force.github.io/unified-alignment-for-agents.html).
 
 If you find this repo useful, please cite our project:
